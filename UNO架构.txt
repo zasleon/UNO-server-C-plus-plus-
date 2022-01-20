@@ -20,19 +20,36 @@
 JSON格式传输大部分消息，除了接收选择颜色客户端只传输1,2,3,4数字
 
 
+架构为：
 
+				顶部
+	游戏1专属属性		游戏2专属属性		游戏3专属属性
+
+				次顶部
+			服务端通用属性与函数功能工具
+
+				中部
+	游戏1专属功能函数	游戏2专属功能函数	游戏3专属功能函数
+	……			……			……
+
+				底部
+		server.h//服务端接收客户端消息，提供某游戏服务
+		test.cpp//启动服务端，基础配置
+
+
+顶部：
 UNO_property.h//UNO游戏专属属性
-
+次顶部：
 server_property.h//服务端基础属性
 json_process.h//json格式报文通用处理
 server_general_function.h//服务端通用功能函数
-
+中部：
 UNO_room_process.h//对UNO游戏房间做处理
 UNO_deck_process.h//对UNO卡片信息与玩家游戏选择做处理
 UNO_AI.h//UNO机器人角色决策
 UNO_start_game.h//开始UNO游戏函数，处理游戏开始到结束
 UNO_service.h//接收客户端json报文，分析其中信号是否为UNO专属信号
-
+底部
 server.h//处理通用客户端发来的请求并提供服务
 test.cpp//启动服务端，基础配置
 
