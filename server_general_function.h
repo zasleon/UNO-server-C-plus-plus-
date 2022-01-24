@@ -94,27 +94,14 @@ void send_this_message(client_member* c1,char* StrBuf)
 	return;
 
 }
-void simple_send_message(client_member* c1,char* StrBuf)
-{
-	//×¨ÃÅÓÃÓÚ×ª»»·Ç×Ö·ûĞÎÊ½ÊıÖµÎª×Ö·û,BufÓÃÓÚÆ¥Åä¿Í»§¶ËÊÇ·ñ»Ø¸´ÁË¡°client_get_message¡±
-	if(sizeof(StrBuf)<MAX_PATH)
-	{
-		::send(g_ClientSocket[c1->member_No-1],StrBuf, (1 + ::strlen(StrBuf)), 0);//·¢ËÍÄÚÈİ
-		cout<<"·¢ËÍ:"<<StrBuf<<"\n";
-	}
-	else
-	{
-		::send(g_ClientSocket[c1->member_No-1],StrBuf, (1 +sizeof(StrBuf)), 0);//·¢ËÍÄÚÈİ
-		cout<<"·¢ËÍÁËÊı¾İ£¡\n"<<"wait reply\n";
-	}
-}
+
 
 char* get_client_message(client_member* c1)//»ñÈ¡¿Í»§¶Ë·¢ËÍµÄĞÅÏ¢
 {
 	memset(c1->p_message,0,sizeof(c1->p_message));
 	Sleep(10);
-	cout<<"µÈ´ıÓÃ»§ÊäÈë\n";
-	while(strlen(c1->message)==0)
+	
+	while(strlen(c1->message)==0)//cout<<"µÈ´ıÓÃ»§ÊäÈë\n";
 	{
 		if(c1->state==in_game||c1->state==UNO_in_game)return "";//Èç¹û½øÈëÓÎÏ·£¬²»ÔÙ¼àÌı
 		if(c1->F_offline)return "";
@@ -123,7 +110,7 @@ char* get_client_message(client_member* c1)//»ñÈ¡¿Í»§¶Ë·¢ËÍµÄĞÅÏ¢
 	addtext(c1->p_message,c1->message);
 	c1->not_be_read=false;
 	Sleep(5);
-	cout<<"get message:"<<c1->p_message<<endl;
+	//cout<<"get message:"<<c1->p_message<<endl;
 	return c1->p_message;
 }
 char* fast_get_client_message(client_member* c1)//¿ìËÙÈ·ÈÏ¿Í»§¶Ë»Ø¸´ÄÚÈİ
@@ -183,7 +170,16 @@ void confirm_send_success(client_member* c1,char* StrBuf)//¼ì²â¶Ô·½ÏûÏ¢ÊÇ·ñÊÕµ½±
 	return;
 }
 
-#define send_sleep_time 300
+void simple_send_message(client_member* c1,char* StrBuf)
+{
+	JSON_package json_msg(StrBuf);
+	json_msg.add_item("state",c1->state);//Ìí¼ÓÁËµ±Ç°ÓÃ»§×´Ì¬£¬Ã¿´ÎÍ¨Ñ¶¶¼Ìí¼ÓÓÃ»§µ±Ç°×´Ì¬£¬ÈÃ¿Í»§¶Ë·¢ÏÖ×Ô¼ºÂ©ÊÕÊı¾İ»òÊı¾İ²»Í¬²½Ê±ÄÜ×ö¸ü¶àµÄ¾ö²ß
+	
+	::send(g_ClientSocket[c1->member_No-1],json_msg.to_StrBuf(), (1 + ::strlen(json_msg.to_StrBuf())), 0);//·¢ËÍÄÚÈİ
+	//cout<<"·¢ËÍ:"<<json_msg.to_StrBuf()<<"\n";
+
+}
+#define send_sleep_time 250
 void send_msg(client_member* c1,char* StrBuf)//²»¼ì²â¶Ô·½ÏûÏ¢ÊÇ·ñÊÕµ½±¨ÎÄStrBuf
 {
 	if(c1==NULL||!c1->member_in_use||c1->F_offline)return;
