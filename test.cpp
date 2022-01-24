@@ -2,14 +2,15 @@
 
 
 
-
 #undef  main;
 void main()
 {
+	  
 	clear_szsc_card();
 	char my_ip[50]="10.125.39.63";int server_port=8001;//用自己电脑ip创建socket//
 	//char my_ip[50]="10.22.46.212";int server_port=8001;//用自己电脑ip创建socket//
-	
+	//char my_ip[50]="10.125.39.145";int server_port=8001;
+
 	//加载网络网络库
 	WSADATA  Data = { 0 };
 	WSAStartup(MAKEWORD(2, 2), &Data);

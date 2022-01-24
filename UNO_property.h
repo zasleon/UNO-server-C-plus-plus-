@@ -2,19 +2,28 @@
 #ifndef INCLUDE_UNO_property_H
 #define INCLUDE_UNO_property_H
 
+//玩家当前状态
+//#define	in_online					6800//处于在线状态
+#define UNO_in_room						6811//处于uno房间中
+#define UNO_in_game						6812//处于uno游戏中
+//#define UNO_in_roomlist				6813//处于选择uno房间列表中
 
+//房间内某一位子的状态
+#define	UNO_empty		0//该位子为空
+#define UNO_human		1//人类玩家
+#define UNO_simple_AI	2//简单机器人
+#define UNO_hard_AI		3//困难机器人
 
-
-
+//游戏常规设置
 #define UNO_member_limit			4//一局游戏上限玩家数量
-#define UNO_room_limit				4//房间上限数量
+#define UNO_room_limit				100//房间上限数量
 #define UNO_deck_card_limit			108//卡组有多少张卡
 #define UNO_user_choose_time_limit	1000*930//用户在自己回合的思考时间限制
 
-
+//游戏时间设置
 #define	UNO_declare_time_limit	1000*4//等待他喊uno的时间，超时则加罚2张卡
-#define UNO_AI_think_time		1000*4//AI执行动作前等待多久
-#define UNO_AI_wait_time		1000*1//AI等多久查看一次是否是当前自己回合
+#define UNO_AI_think_time		1000*3//AI执行动作前等待多久
+#define UNO_AI_wait_time		500//AI等多久查看一次是否是当前自己回合
 
 //牌色
 #define UNO_green	1
@@ -22,8 +31,6 @@
 #define UNO_blue	3
 #define UNO_yellow	4
 #define UNO_black	5
-
-
 
 //特殊功能
 #define UNO_none		-1//卡槽为空
@@ -39,18 +46,6 @@
 
 #define UNO_clockwise		1
 #define UNO_anti_clockwise	2
-
-//房间内某一位子的状态
-#define	UNO_empty		0//该位子为空
-#define UNO_human		1//人类玩家
-#define UNO_simple_AI	2//简单机器人
-#define UNO_hard_AI		3//困难机器人
-
-//玩家当前状态
-//#define	in_online					6802//处于在线状态
-#define UNO_in_room					6803//处于uno房间中
-#define UNO_in_game					6804//处于uno游戏中
-//#define UNO_in_roomlist				6805//处于选择uno房间列表中
 
 
 struct client_member;
@@ -76,7 +71,7 @@ struct UNO_player
 
 	int		only_color;//如果玩家在出万能牌选择颜色后自己只剩一张牌，记录他选出的颜色
 	int		not_have_color;//若一个玩家选择摸牌，则该玩家没有牌桌上当前颜色的牌，进行记录
-	int		i_want_play_this_card;//AI思考，如果自己哪种颜色手牌比较多，就先记录该种颜色，如果遇到自己想使用黑牌，就选那个颜色
+	int		i_want_play_this_color;//AI思考，如果自己哪种颜色手牌比较多，就先记录该种颜色，如果遇到自己想使用黑牌，就选那个颜色
 	
 };
 

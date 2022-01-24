@@ -4,7 +4,7 @@
 #include "SZSC_service.h"
 #include "movie_function.h"
 #include "UNO_service.h"
-#include <WS2tcpip.h>
+
 
 //#pragma comment(lib,"F:\\VC6.0PROJECT\\szsc_server\\Debug\\fight_room.lib")
 //_declspec(dllexport) void start_fight(client_member* p,fight_room* this_room);
@@ -82,32 +82,31 @@ void communicate_with_this_client(client_member* c1)//服务器与客户端进行沟通
 			//"请选择:";
 		//if(c1->device!=android_phone)special_signal(c1,show_choice);
 
-		cout<<"主界面开始监听用户"<<c1->client_name;
-
-			memset(StrBuf,0,sizeof(StrBuf));
-			addtext(StrBuf,get_client_message(c1));
-			Sleep(100);
-			if(c1->F_offline){client_offline(c1);return;}//获取用户输入信息，若断线则结束沟通
+		//cout<<"主界面开始监听用户"<<c1->client_name;
+		memset(StrBuf,0,sizeof(StrBuf));
+		addtext(StrBuf,get_client_message(c1));
+		Sleep(100);
+		if(c1->F_offline){client_offline(c1);return;}//获取用户输入信息，若断线则结束沟通
 			
-			if(c1->state==in_game)//此判定通过，必然是房间宾客进入了SZSC游戏
-			{
+		switch(c1->state)
+		{
+			case in_game://此判定通过，必然是房间宾客进入了SZSC游戏
 				start_fight(c1,&player_room[c1->room_No]);
 				c1->state=in_room;//游戏结束，回到房间状态
-
-				if(c1->device!=android_phone)special_signal(c1,show_choice);
+				//if(c1->device!=android_phone)special_signal(c1,show_choice);
 				continue;
-			}
-
-			if(c1->state==UNO_in_game)//此判定通过，必然是房间宾客进入了UNO游戏
-			{
+			case UNO_in_game://此判定通过，必然是房间宾客guest进入了UNO游戏
 				UNO_start_one_game(c1,false);
 				if(!c1->F_offline)
-					c1->state=UNO_in_room;//游戏结束，回到房间状态
-				continue;
-			}
+				c1->state=UNO_in_room;//游戏结束，回到房间状态
+			continue;
+			
+		}
 
-			JSON_package json_msg(StrBuf);
-			cout<<"大厅接收到发来请求："<<StrBuf<<endl;
+
+		JSON_package json_msg(StrBuf);
+		//cout<<"大厅接收到发来请求："<<StrBuf<<endl;
+		
 		if(UNO_provide_service(c1,json_msg))//如果是UNO游戏请求，跳过以下服务
 			continue;
 		if(SZSC_provide_service(c1,atoi(StrBuf)))//如果是SZSC游戏请求，跳过以下服务

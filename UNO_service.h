@@ -35,6 +35,14 @@ bool UNO_provide_service(client_member* c1,JSON_package json_msg)
 			if(c1->state!=UNO_in_room)
 			{send_msg_signal(c1,UNO_not_got_room_operate_right);return true;}
 			break;
+		default:
+			if(c1->state==UNO_in_room)//如果已经在房间
+			{
+				UNO_refresh_room_member_to_all(UNO_already_in_room,&uno_room[c1->room_No],c1);//刷新成员
+				return true;
+			}
+			if(c1->state==UNO_in_game)
+				return true;
 	}
 
 	switch(atoi(json_msg.get_value("signal")))
@@ -62,6 +70,7 @@ bool UNO_provide_service(client_member* c1,JSON_package json_msg)
 			return true;
 
 	}
+	
 	return false;//不是UNO信号信息
 }
 

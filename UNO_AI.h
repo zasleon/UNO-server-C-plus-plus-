@@ -39,7 +39,13 @@ UNO_player* UNO_check_who_is_the_next(UNO_room* this_room,UNO_player* p1)//È·ÈÏË
 
 void UNO_AI_which_color_i_wanna_play(UNO_room* this_room,UNO_player* p1)//·ÖÎö×Ô¼ºÊÖÅÆ£¬È·¶¨×Ô¼ºÏë³öÊ²Ã´ÑÕÉ«ÅÆ£¬Èç¹û×Ô¼ºÓöµ½ºÚÅÆÑ¡ÔñÇé¿ö£¬Ñ¡ÔñÄÇ¸öÑÕÉ«
 {
+	
 	cout<<"AIË¼¿¼ÒªÊ²Ã´ÑÕÉ«\n";
+	if(p1->card_color[0]==UNO_none)//Èç¹û×Ô¼º×îºóÒ»ÕÅÊÇºÚÅÆ£¬´òÍêºóÃ»ÅÆÁË£¬ÔòËæ±ãÑ¡¸öÑÕÉ«
+	{
+		p1->i_want_play_this_color=UNO_green;
+		return;
+	}
 	int color_box[4];//4ÖÖÑÕÉ«£¬´æ´¢ÑÕÉ«¿¨ÊıÁ¿£¬ÒòÎªÑÕÉ«ĞòºÅÎª1£¬2£¬3£¬4£¬ËùÒÔ´æµ½0£¬1£¬2£¬3
 		for(int k=0;k<4;k++)
 		{
@@ -57,7 +63,7 @@ void UNO_AI_which_color_i_wanna_play(UNO_room* this_room,UNO_player* p1)//·ÖÎö×Ô
 
 		int color_number=0;//×î´óÊıÁ¿³õÊ¼ÖµÎª0
 		
-		p1->i_want_play_this_card=UNO_none;//Çå¿ÕÔ­ÏÈÏëÒªµÄÑÕÉ«
+		p1->i_want_play_this_color=UNO_none;//Çå¿ÕÔ­ÏÈÏëÒªµÄÑÕÉ«
 		for(i=0;i<4;i++)
 			if(color_box[i]>color_number)//Èç¹ûµ±Ç°ÑÕÉ«ÊıÁ¿´óÓÚ×î´óÊıÁ¿£¬
 			{
@@ -72,12 +78,11 @@ void UNO_AI_which_color_i_wanna_play(UNO_room* this_room,UNO_player* p1)//·ÖÎö×Ô
 					}
 				}
 				if(find_another)continue;
-				p1->i_want_play_this_card=i+1;//½«µ±Ç°Ïë³öµÄÑÕÉ«ĞŞÕıÎªµ±Ç°ÑÕÉ«
+				p1->i_want_play_this_color=i+1;//½«µ±Ç°Ïë³öµÄÑÕÉ«ĞŞÕıÎªµ±Ç°ÑÕÉ«
 			}
 
-		if(p1->i_want_play_this_card==UNO_none)//Èç¹ûÃ»»ñÈ¡µ½ÏëÒªµÄÑÕÉ«£¬ËµÃ÷¿ÉÄÜ×Ô¼ºÑ¡µÄÑÕÉ«»áµ¼ÖÂ±ğÈËÓ®
+		if(p1->i_want_play_this_color==UNO_none)//Èç¹ûÃ»»ñÈ¡µ½ÏëÒªµÄÑÕÉ«£¬ËµÃ÷¿ÉÄÜ×Ô¼ºÓĞµÄÑÕÉ«»áµ¼ÖÂ±ğÈËÓ®£¬¶ø×Ô¼ºÃ»µÄÑÕÉ«±ğÈËÒ²¿ÉÄÜÃ»£¬ËùÒÔÑ¡Ò»¸ö´ó¼Ò¶¼Ã»µÄÑÕÉ«
 		{
-			cout<<"AIÔİÊ±Ã»ÕÒµ½ÎÒÒªµÄÑÕÉ«\n";
 			for(int k=0;k<4;k++)
 			{
 				color_box[k]=0;
@@ -85,13 +90,17 @@ void UNO_AI_which_color_i_wanna_play(UNO_room* this_room,UNO_player* p1)//·ÖÎö×Ô
 			for(int i=0;i<UNO_member_limit;i++)
 				if(this_room->player[i].card_color[1]==UNO_none&&this_room->player[i].only_color!=UNO_none)
 				{
+					cout<<i<<"ºÅ-Íæ¼Ò"<<UNO_get_this_card_color(this_room->player[i].only_color)<<endl;
 					color_box[this_room->player[i].only_color-1]++;
 				}
+			
+			cout<<"ÂÌ"<<color_box[0]<<"ºì"<<color_box[1]<<"À¶"<<color_box[2]<<"»Æ"<<color_box[3]<<endl;
+			
 			for(int i=0;i<4;i++)
 				if(color_box[i]==0)
 				{
-					p1->i_want_play_this_card=i+1;//Ñ¡±ğÈËÃ»ÓĞµÄÑÕÉ«£¬ÈÃ´ó¼Ò¶¼²»µÃ²»³é¿¨
-					cout<<"ÆÆ¸ª³ÁÖÛ"<<i+1<<endl;
+					cout<<"ÆÆ¸ª³ÁÖÛ!\n";
+					p1->i_want_play_this_color=i+1;//Ñ¡±ğÈËÃ»ÓĞµÄÑÕÉ«£¬ÈÃ´ó¼Ò¶¼²»µÃ²»³é¿¨
 					return;
 				}
 		}
@@ -112,13 +121,13 @@ bool UNO_prior_use_forbidden_or_reverse_or_add_2(UNO_room* this_room,UNO_player*
 			{
 				if(this_room->current_color==p1->card_color[i]&&(p1->card_effect[i]==UNO_forbid||p1->card_effect[i]==UNO_reverse||p1->card_effect[i]==UNO_ADD_2))
 				{
-					UNO_play_this_card(this_room,p1,i);//´ò³öÍ¬É«µÄ¹¦ÄÜÅÆ
-					return true;
+					if(UNO_user_apply_play_this_card(this_room,p1,i))//´ò³öÍ¬É«µÄ¹¦ÄÜÅÆ
+						return true;
 				}
 				if(this_room->last_effect==p1->card_effect[i]&&(p1->card_effect[i]==UNO_forbid||p1->card_effect[i]==UNO_reverse||p1->card_effect[i]==UNO_ADD_2))
 				{
-					UNO_play_this_card(this_room,p1,i);//´ò³öÏàÍ¬Ğ§¹ûµÄ¹¦ÄÜÅÆ
-					return true;
+					if(UNO_user_apply_play_this_card(this_room,p1,i))//´ò³öÏàÍ¬Ğ§¹ûµÄ¹¦ÄÜÅÆ
+						return true;
 				}
 			}
 
@@ -145,8 +154,8 @@ bool UNO_AI_think_whether_use_black_card(UNO_room* this_room,UNO_player* p1)//Ë¼
 			for(int i=7;i>=0;i--)//¿¨×éºÚÅÆÒ»¹²¾Í8ÕÅ£¬Ò»°ãºÚÉ«ÍòÄÜÅÆÅÅÔÚºÚÉ«+4ºóÃæ£¬ÓÅÏÈÊ¹ÓÃÍòÄÜÅÆ
 				if(p1->card_color[i]==UNO_black)
 				{
-					UNO_play_this_card(this_room,p1,i);
-					return true;
+					if(UNO_user_apply_play_this_card(this_room,p1,i))
+						return true;
 				}
 		}
 	return false;
@@ -166,8 +175,8 @@ bool UNO_AI_think_whether_use_add_4_to_next_player(UNO_room* this_room,UNO_playe
 		for(int i=0;i<UNO_deck_card_limit;i++)
 			if(p1->card_effect[i]==UNO_ADD_4)//´ò³öºÚ+4
 			{
-				UNO_play_this_card(this_room,p1,i);
-				return true;
+				if(UNO_user_apply_play_this_card(this_room,p1,i))
+					return true;
 			}
 			else
 				break;
@@ -184,8 +193,8 @@ bool UNO_AI_think_whether_change_color(UNO_room* this_room,UNO_player* p1)//Ë¼¿¼
 			for(int j=7;j>=0;j--)
 				if(p1->card_color[j]==UNO_black)//³¢ÊÔ´ò³öºÚ¿¨ĞŞ¸ÄÑÕÉ«£¬ÓÅÏÈÊ¹ÓÃÍòÄÜÅÆ
 				{
-					UNO_play_this_card(this_room,p1,j);
-					return true;
+					if(UNO_user_apply_play_this_card(this_room,p1,j))
+						return true;
 				}
 		}
 	return false;
@@ -216,8 +225,8 @@ bool UNO_AI_careful_follow_play_card(UNO_room* this_room,UNO_player* p1)//½÷É÷¸ú
 						continue;
 				}
 
-				UNO_play_this_card(this_room,p1,i);//°ÑÄÇÕÅÅÆ´ò³ö,´ò³öÅÆº¯ÊıÄÚ×Ô´ø»ØºÏÇĞ»»
-				return true;//×÷³öĞĞ¶¯ÁË
+				if(UNO_user_apply_play_this_card(this_room,p1,i))//°ÑÄÇÕÅÅÆ´ò³ö,´ò³öÅÆº¯ÊıÄÚ×Ô´ø»ØºÏÇĞ»»
+					return true;//×÷³öĞĞ¶¯ÁË
 			}
 		
 		}
@@ -243,8 +252,8 @@ bool UNO_AI_simple_follow_play_card(UNO_room* this_room,UNO_player* p1)//µ¥´¿¸úÅ
 			{
 				cout<<this_room->whose_turn<<"ºÅAI¼ÆËãÍêÁË\n";
 				
-				UNO_play_this_card(this_room,p1,i);//°ÑÄÇÕÅÅÆ´ò³ö,´ò³öÅÆº¯ÊıÄÚ×Ô´ø»ØºÏÇĞ»»
-				return true;//×÷³öĞĞ¶¯ÁË
+				if(UNO_user_apply_play_this_card(this_room,p1,i))//°ÑÄÇÕÅÅÆ´ò³ö,´ò³öÅÆº¯ÊıÄÚ×Ô´ø»ØºÏÇĞ»»
+					return true;//×÷³öĞĞ¶¯ÁË
 			}
 		
 		}
@@ -266,7 +275,7 @@ void UNO_AI_think(UNO_player* p1)
 		{
 			if(this_room->game_over)//Èç¹ûµ±Ç°Ã»ÔÚÓÎÏ·ÖĞÁË£¬½áÊøAIË¼¿¼Ïß³Ì
 			{
-				cout<<"AI"<<p1->room_member_NO<<"exit\n";
+				//cout<<"AI"<<p1->room_member_NO<<"exit\n";
 				return;
 			}
 			//Èç¹ûÄÜ¡°ÇÀ¡±£¬¡°ÇÀ¡±
@@ -279,7 +288,7 @@ void UNO_AI_think(UNO_player* p1)
 			Sleep(UNO_AI_think_time/25);//ÈÃÆäËûÈËÓĞ¡°ÇÀ¡±µÄÊ±¼ä
 			if(this_room->game_over)//Èç¹ûµ±Ç°Ã»ÔÚÓÎÏ·ÖĞÁË£¬½áÊøAIË¼¿¼Ïß³Ì
 			{
-				cout<<"AI"<<p1->room_member_NO<<"exit\n";
+				//cout<<"AI"<<p1->room_member_NO<<"exit\n";
 				return;
 			}
 		}
@@ -292,11 +301,12 @@ void UNO_AI_think(UNO_player* p1)
 		}
 		
 		//¹ÒÆğÆäËûËùÓĞÈËÏß³Ì
-		cout<<this_room->whose_turn<<"ºÅAI¿ªÊ¼¼ÆËã\n";
+		cout<<"\n";
+		cout<<this_room->whose_turn+1<<"ºÅAI¿ªÊ¼¼ÆËã";
 
 
-		//·ÖÎö×Ô¼ºÊÖÅÆ£¬È·¶¨×Ô¼ºÏë³öÊ²Ã´ÑÕÉ«ÅÆ£¬Èç¹ûÖ®ºó×Ô¼ºÓöµ½ºÚÅÆÑ¡ÔñÇé¿ö£¬Ñ¡ÔñÄÇ¸öÑÕÉ«
-		UNO_AI_which_color_i_wanna_play(this_room,p1);
+		//·ÖÎö×Ô¼ºÊÖÅÆ£¬È·¶¨×Ô¼ºÏë³öÊ²Ã´ÑÕÉ«ÅÆ£¬Èç¹ûÖ®ºó×Ô¼ºÓöµ½ºÚÅÆÑ¡ÔñÇé¿ö£¬Ñ¡ÔñÄÇ¸öÑÕÉ«,Õâ¸öº¯ÊıÔÚAIÃ¿´ÎÑ¡ÔñÑÕÉ«Ê±¶¼»á´ò³ö£¬²»ÓÃÔÚÕâÀïÊ¹ÓÃ
+		//UNO_AI_which_color_i_wanna_play(this_room,p1);
 
 
 		//£¨º¯Êı·µ»Øfalse£©±íÊ¾Ã»´ò³öÅÆ£¬£¨º¯Êı·µ»Øtrue£©±íÊ¾Èç¹ûÖ®Ç°ÄÇĞ©¾ö²ßµ¼ÖÂ»úÆ÷ÈËÒÑ¾­´ò³öÊÖ¿¨£¬continue±íÊ¾½øĞĞÏÂÒ»¸öµÈ´ıÑ­»·£¬µÈ´ıÏÂÒ»¸ö×Ô¼ºµÄ»ØºÏµ½À´
@@ -307,34 +317,37 @@ void UNO_AI_think(UNO_player* p1)
 
 
 		//Èç¹û×Ô¼ºÏÂ¼ÒÖ»Ê£Ò»ÕÅÅÆÇÒÈ·¶¨only_colorºÍlast_colorÒ»Ñù£¬Ôò´ò³öÍòÄÜÅÆ£¬Ã»ÓĞµÄ»°³¢ÊÔ´ò³ö+2£¬Ã»ÓĞµÄ»°³¢ÊÔ´ò³ö+4£¬Ã»ÓĞµÄ»°´ò³ö¹¦ÄÜÅÆforbid£¬Ã»ÓĞµÄ»°´ò³ö¹¦ÄÜÅÆreverse
-	
+		cout<<"1";
 		//Èç¹ûÏÂ¼ÒÖ»Ê£Ò»ÕÅ¿¨£¬´ò³ö+4
 		if(UNO_AI_think_whether_use_add_4_to_next_player(this_room,p1))continue;
-		
-		//Èç¹û³¡ÉÏÓĞÈËÖ»Ê£Ò»ÕÅÅÆÇÒÈ·¶¨only_colorºÍlast_colorÒ»Ñù£¬Ôò´ò³öÍòÄÜÅÆ¸Ä±äÑÕÉ«£¬Ñ¡ÔñÒ»¸ö×Ô¼ºÓĞµÄÑÕÉ«µ«²»ÊÇÄÇÈËµÄonly_color£¬»òÕßËæ»ú¸Ä±äÑÕÉ«
+		cout<<"2";
+		//Èç¹û³¡ÉÏÓĞÈËÖ»Ê£Ò»ÕÅÅÆÇÒÈ·¶¨only_colorºÍlast_colorÒ»Ñù£¬Ôò´ò³öºÚÅÆ¸Ä±äÑÕÉ«£¬Ñ¡ÔñÒ»¸ö×Ô¼ºÓĞµÄÑÕÉ«µ«²»ÊÇÄÇÈËµÄonly_color£¬»òÕßËæ»ú¸Ä±äÑÕÉ«
 		if(UNO_AI_think_whether_change_color(this_room,p1))continue;
 		
-
+		cout<<"3";
 		//Èç¹û×Ô¼ºÏÂ¼ÒÊÖ¿¨<=3ÕÅ,³¢ÊÔÓÅÏÈÊ¹ÓÃ¹¦ÄÜ¿¨
 		if(UNO_prior_use_forbidden_or_reverse_or_add_2(this_room,p1))continue;
 		
 		//Èç¹û×Ô¼ºÖ»ÊÖ¿¨<=3ÕÅÇÒ¶¼ÊÇÍ¬É«£¬´ò³öºÚ¿¨±äÎª×Ô¼ºÁíÒ»ÕÅ¿¨µÄÑÕÉ«
 
 		//ÓÅÏÈ³ö0
-
+		cout<<"4";
 		//ÓÅÏÈÆÕÍ¨¸úÅÆ
 		if(UNO_AI_careful_follow_play_card(this_room,p1))continue;//Èç¹ûÀïÃæ×÷³ö¸úÅÆĞĞ¶¯£¬½øĞĞÏÂÒ»¸öµÈ´ıÑ­»·£¬µÈ´ıÏÂÒ»¸ö×Ô¼ºµÄ»ØºÏµ½À´
-		
+		cout<<"5";
 		//Èç¹ûÃ»ÓĞÑÕÉ«ºÍĞ§¹ûÄÜ¸ú£¬Ôò¿¼ÂÇÒª²»Òª³öºÚÅÆÈÃ×Ô¼º¾¡¿ÉÄÜ»ñµÃÖ÷¶¯È¨
 		if(UNO_AI_think_whether_use_black_card(this_room,p1))continue;
-		
+		cout<<"6";
 		//Ö´ĞĞµ½ÕâÀï£¬ËµÃ÷Ö®Ç°Ã»ÅÆ¸ú£¬½øĞĞ³é¿¨
 		UNO_user_apply_get_card(this_room,p1,1);
 		Sleep(300);
+		cout<<"7";
 		//³é¿¨ºó£¬Èç¹ûÓĞÅÆÄÜ³ö£¬³ö£»Èç¹ûÃ»ÅÆ¿É³ö£¬Ñ¡Ôñ¡°¹ı¡±
 		if(UNO_AI_careful_follow_play_card(this_room,p1))continue;//Èç¹ûÀïÃæ×÷³ö¸úÅÆĞĞ¶¯£¬½øĞĞÏÂÒ»¸öµÈ´ıÑ­»·£¬µÈ´ıÏÂÒ»¸ö×Ô¼ºµÄ»ØºÏµ½À´
 		//³é¿¨ºó£¬¿´×Ô¼ºÒª²»Òª³öºÚ¿¨£¬ÒòÎª¿ÉÄÜ³éµ½ºÚ¿¨
+		cout<<"8";
 		if(UNO_AI_think_whether_use_black_card(this_room,p1))continue;
+		cout<<"9";
 		//µ½ÕâÀïËµÃ÷¼´±ã³é¿¨ºóÒ²Ã»Í¬É«»òÍ¬ºÅÅÆ¿É³ö£¬Ñ¡Ôñ¡°¹ı¡±
 		UNO_user_apply_change_turn(this_room,p1);//»úÆ÷ÈË²Ù×÷Íê³É£¬ÇĞ»»½ÇÉ«»ØºÏ£¬Èç¹ûÓĞ¼Ó·£Ğ§¹û£¬ÔÚ¸Ãº¯ÊıÄÚÖ´ĞĞ¼Ó·£
 

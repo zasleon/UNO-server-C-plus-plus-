@@ -210,9 +210,9 @@ JSON_package::JSON_package(char* StrBuf)
 	if(StrBuf[0]=='{')//粗略过滤，有时候纯数字字符串也会被parse判断为正常json格式报文，导致取值出错
 	{
 		if(reader.parse(json_string, json_struct))//将字符串内容转化为结构体
-			cout<<"解析成功!\n";
+			;//cout<<"解析成功!\n";
 		else
-			cout<<"reader parse error[json解析出错!]:"<<strerror(errno)<<endl;
+			cout<<"[客户端json报文解析出错!]reader parse error:"<<strerror(errno)<<endl;
 	}
 	else
 		cout<<"错误json报文!\n";

@@ -1,24 +1,26 @@
 #ifndef INCLUDE_server_property_H
 #define INCLUDE_server_property_H
 
-#include "iostream"
-#include "winsock2.h"
-#include <string>
-#include <cstring>
-#include <iostream>
-#include <cmath>
 
+
+
+#include <time.h>
+//#include <fstream>
+#include "winsock2.h"
+//#include <cstring>
+//#include <iostream>
+//#include <windows.h>
 
 #include "UNO_property.h"//UNO游戏数据
 #include "card_effect.h"//SZSC游戏数据
 using namespace std;
 #pragma comment(lib,"Ws2_32.lib")
+//#include <WS2tcpip.h>
 
 
 
 
-
-#define memberlimit					5//服务器承载人数上限
+#define memberlimit					5000//服务器承载人数上限
 #define sleeptime					50//服务器稍微延迟发送数据时间
 
 
@@ -35,11 +37,14 @@ using namespace std;
 #define username_too_long			6726
 #define login_success				6727//能合法顺利登录了
 
+#define	in_online					6800//处于在线状态
+#define	in_game						6801//处于游戏状态
+#define in_room						6802//处于在房间状态
+#define in_roomlist					6803//处于在房间状态
 
-#define	in_game						6800//处于游戏状态
-#define in_room						6801//处于在房间状态
-#define	in_online					6802//处于在线状态
-
+//#define UNO_in_room				6811//处于uno房间中
+//#define UNO_in_game				6812//处于uno游戏中
+//#define UNO_in_roomlist			6813
 
 #define force_offline				7000//客户端下线了
 #define you_are_in_the_lobby		7000//用户输入0时，让其回到用户界面

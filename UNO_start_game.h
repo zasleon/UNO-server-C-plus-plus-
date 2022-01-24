@@ -5,12 +5,7 @@
 
 void UNO_game_ini(UNO_room* this_room)//游戏开始的各种初始化工作
 {
-	UNO_ini_deck(this_room);//初始化卡组
-	this_room->whose_turn=-1;//当前还没确认是谁的回合
-	this_room->clock_direct=true;//初始默认为顺时针发牌
-	this_room->current_running_effect=UNO_none;
-	this_room->punish_card_number=0;
-	for(int i=0;i<UNO_member_limit;i++)
+	for(int i=0;i<UNO_member_limit;i++)//角色数据初始化
 	{
 		if(this_room->player[i].state!=UNO_empty)//座位上不为空的给他发牌
 		{
@@ -20,7 +15,7 @@ void UNO_game_ini(UNO_room* this_room)//游戏开始的各种初始化工作
 			}
 			else//如果是机器人，开启机器人思考线程
 			{
-				cout<<"开启机器人\n";
+				//cout<<"开启机器人\n";
 				if(this_room->AI_thread[i]!=NULL)
 					CloseHandle(this_room->AI_thread[i]);//防止句柄被用完
 				this_room->AI_thread[i]=CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)UNO_AI_think,&this_room->player[i], NULL, NULL);//开启AI思考线程
@@ -31,10 +26,20 @@ void UNO_game_ini(UNO_room* this_room)//游戏开始的各种初始化工作
 			this_room->player[i].not_declare_UNO_time=0;
 			this_room->player[i].whether_declare_UNO=false;
 			this_room->player[i].whether_choosing_color=false;
+
+			this_room->player[i].only_color=UNO_none;
+
+
 			UNO_clean_player_card(&this_room->player[i]);//将该座位上角色手卡清空
 
 		}//对该座位上的角色处理结束
 	}//对所有角色处理结束
+
+	UNO_ini_deck(this_room);//初始化卡组
+	this_room->whose_turn=-1;//当前还没确认是谁的回合
+	this_room->clock_direct=true;//初始默认为顺时针发牌
+	this_room->current_running_effect=UNO_none;
+	this_room->punish_card_number=0;
 }
 
 
@@ -115,10 +120,9 @@ void UNO_player_choose_color(UNO_room* this_room,UNO_player* p1)//因为出了黑色牌
 	{
 		UNO_AI_which_color_i_wanna_play(this_room,p1);
 		if(this_room->current_color==UNO_none){cout<<"机器选择了奇怪颜色???????\n";}
-		UNO_update_current_color(this_room,p1,p1->i_want_play_this_card);//广播当前可以出的颜色
+		UNO_update_current_color(this_room,p1,p1->i_want_play_this_color);//广播当前可以出的颜色
 
-		if(p1->card_color[1]==UNO_none)
-			p1->only_color=this_room->current_color;
+		p1->only_color=this_room->current_color;
 		return;
 	}
 	
@@ -160,8 +164,7 @@ void UNO_player_choose_color(UNO_room* this_room,UNO_player* p1)//因为出了黑色牌
 	}
 	
 	p1->whether_choosing_color=false;
-	if(p1->card_color[1]==UNO_none)
-		p1->only_color=this_room->current_color;
+	p1->only_color=this_room->current_color;
 	
 
 }
@@ -268,12 +271,10 @@ void UNO_start_one_game(client_member* c1,bool whether_positive)
 
 	UNO_room* this_room=&uno_room[c1->room_No];
 	UNO_player* p1=NULL;//获取c1用户的角色p1
-	int my_place=-1;
 	for(int i=0;i<UNO_member_limit;i++)
 		if(uno_room[c1->room_No].player[i].c1->member_No==c1->member_No)
 		{
 			p1=&uno_room[c1->room_No].player[i];
-			my_place=i;
 			break;
 		}
 	
@@ -295,6 +296,17 @@ void UNO_start_one_game(client_member* c1,bool whether_positive)
 	else//如果不是启动游戏的活人，等待游戏开始，AI在其线程内也等待游戏开始
 		while(!this_room->game_start)
 			Sleep(200);
+	/*
+	this_room->AI_thread[p1->room_member_NO]=CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)UNO_AI_think,&this_room->player[p1->room_member_NO], NULL, NULL);//开启AI思考线程
+	while(true)
+	{
+		Sleep(500);
+		if(this_room->game_over)
+		{
+			p1->state=UNO_human;
+			return;
+		}
+	}*/
 	
 
 	while(true)
@@ -401,7 +413,7 @@ void UNO_start_one_game(client_member* c1,bool whether_positive)
 				break;
 			case UNO_apply_play_this_card://出牌
 				//cout<<"活人选择出牌\n";
-				UNO_play_this_card(this_room,p1,atoi(json_msg.get_value("which_card")));//出牌，该函数内包含判定能不能出打出这张牌，该函数里会执行回合切换
+				UNO_user_apply_play_this_card(this_room,p1,atoi(json_msg.get_value("which_card")));//出牌，该函数内包含判定能不能出打出这张牌，该函数里会执行回合切换
 				break;
 			
 			default:

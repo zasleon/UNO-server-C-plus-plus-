@@ -616,6 +616,7 @@ void UNO_game_over_process(UNO_room* this_room,UNO_player* p1,bool win)//p1Ó®ÁË£
 {
 
 	this_room->game_over=true;
+	Sleep(500);
 	this_room->game_start=false;
 
 	JSON_package json_msg;
@@ -626,7 +627,6 @@ void UNO_game_over_process(UNO_room* this_room,UNO_player* p1,bool win)//p1Ó®ÁË£
 		if(this_room->player[i].state==UNO_human)
 		{
 			json_msg.add_item("your_number",i);
-			this_room->player[i].c1->state=UNO_in_room;//×´Ì¬±ä»ØÔÚ·¿¼äÖĞ
 			if(win)//Èç¹ûÊÇ»ñÊ¤¶ø½áÊøµÄÓÎÏ·
 			{
 				json_msg.add_item("winner_number",p1->room_member_NO);
@@ -640,7 +640,7 @@ void UNO_game_over_process(UNO_room* this_room,UNO_player* p1,bool win)//p1Ó®ÁË£
 				json_msg.add_item("signal",UNO_game_over_lack_player);
 				send_msg(this_room->player[i].c1,json_msg.to_StrBuf());	
 			}
-
+			this_room->player[i].c1->state=UNO_in_room;//×´Ì¬±ä»ØÔÚ·¿¼äÖĞ
 		}
 	}
 }
@@ -687,51 +687,7 @@ void UNO_player_choose_color(UNO_room* this_room,UNO_player* p1);
 void UNO_play_this_card(UNO_room* this_room,UNO_player* p1,int choice)//´ò³öÕâÕÅÅÆ
 {
 
-	if(choice<0||choice>UNO_deck_card_limit)//³öÅÆÖ¸¶¨Î»ÖÃÔ½½ç£¬ÎŞÊÓÇëÇó
-	{
-		//cout<<"³öÅÆÖ¸¶¨Î»ÖÃÔ½½ç£¬ÎŞÊÓÇëÇó\n";
-		return;
-	}
-	if(p1->card_color[choice]==UNO_none)//¸Ã²ÛÄÚÃ»ÓĞ¿¨
-	{
-		//cout<<choice<<"¸Ã²ÛÄÚÃ»ÓĞ¿¨!\n";		
-		UNO_update_all_info_to_himself(this_room,p1);//¸üĞÂËùÓĞĞÅÏ¢
-		return;
-	}
-
-	//ÅĞ¶¨¸ÃÅÆÄÜ²»ÄÜÊ¹ÓÃ
-	if(!UNO_judge_whether_can_play(this_room,p1,choice))//Èç¹û²»ÄÜ´ò³öÕâÕÅÅÆ£¬½øĞĞÌáÊ¾
-	{
-		if(p1->state!=UNO_human){cout<<"»úÆ÷ÈË´ò³ö´íÎó¿¨!";UNO_cout_this_card(p1->card_color[choice],p1->card_effect[choice]);return;}
-		UNO_update_all_info_to_himself(this_room,p1);//¸üĞÂËùÓĞĞÅÏ¢
-		if(this_room->whose_turn==p1->room_member_NO)//Èç¹ûµ±Ç°ÊÇ×Ô¼º»ØºÏ
-		{
-			if(this_room->current_running_effect==UNO_add_card)//Èç¹ûµ±Ç°ÓĞ¼Ó·£Ğ§¹û
-				UNO_tips(p1,UNO_got_punish);
-			else
-				UNO_tips(p1,UNO_cannot_play_this_card);//½øĞĞÌáÊ¾£¬ÎŞ·¨´ò³öÕâÕÅÅÆ
-		}
-		//cout<<"×îºóÒ»ÕÅÅÆÊÇ";cout_this_card(this_room->last_color,this_room->last_effect);
-		//cout<<"¿É³öµÄÑÕÉ«ºÍĞ§¹ûÊÇ:";cout_this_card(this_room->current_color,this_room->last_effect);
-		//cout<<"ÄãÏë³öµÄÊÇ:";cout_this_card(p1->card_color[choice],p1->card_effect[choice]);
-		//cout<<"³öÅÆÊ§°Ü\n";
-		return ;//ÎŞ·¨Ê¹ÓÃ
-	}
-	//Ö´ĞĞµ½ÕâÀï±ØÈ»ÄÜ´ò³öÕâÕÅ¿¨£¬µ«ÒªÅĞ¶ÏÊÇ·ñÊÇ×Ô¼º»ØºÏ£¬ÊÇµÄÔò¿ÉÒÔ£¬²»ÊÇÔò²»¿ÉÒÔ
-
-	if(p1->card_color[choice]==this_room->last_color&&p1->card_effect[choice]==this_room->last_effect)//ÇÀ£¬ÎŞÊÓµ±Ç°ÊÇ·ñÊÇÎÒµÄ»ØºÏ£¬ÈôÏë³öµÄÅÆÓëµ±Ç°ÅÆÒ»ÖÂ£¬Ö±½Ó³ö
-	{
-		UNO_seize_turn(this_room,p1);//Ç¿ÖÆ±äÎªÎÒµÄ»ØºÏ,²¢´ò³öÄÇÕÅ¿¨
-	}
-	else
-		if(this_room->whose_turn!=p1->room_member_NO)//Èôµ±Ç°²»ÊÇÎÒµÄ»ØºÏ
-		{
-			UNO_update_all_info_to_himself(this_room,p1);//¸üĞÂËùÓĞĞÅÏ¢
-			//cout<<"µ±Ç°²»ÊÇÎÒµÄ»ØºÏ£¬ÎŞÊÓÇëÇó,ÎŞ·¨³öÅÆ\n";
-			return;
-		}
-
-	//Ö´ĞĞµ½ÕâÀï±ØÈ»ÄÜ´ò³öÄÇÕÅÅÆ
+	
 	//·âËøÆäËûÓÃ»§Ïß³Ì£¬°üÀ¨»úÆ÷ÈËµÄ£¬À´´¦Àí´ò³öÕâÕÅÅÆµÄÊÂ¼ş
 	UNO_lock_player(this_room,p1);
 
@@ -786,10 +742,57 @@ void UNO_play_this_card(UNO_room* this_room,UNO_player* p1,int choice)//´ò³öÕâÕÅ
 
 	//´¦ÀíÊÂ¼şÍê³É£¬½â·ÅÆäËûÓÃ»§Ïß³Ì¼àÌı
 	UNO_release_player(this_room,p1);
-	return ;
 
 }
+bool UNO_user_apply_play_this_card(UNO_room* this_room,UNO_player* p1,int choice)
+{
+	if(choice<0||choice>UNO_deck_card_limit)//³öÅÆÖ¸¶¨Î»ÖÃÔ½½ç£¬ÎŞÊÓÇëÇó
+	{
+		//cout<<"³öÅÆÖ¸¶¨Î»ÖÃÔ½½ç£¬ÎŞÊÓÇëÇó\n";
+		return false;
+	}
+	if(p1->card_color[choice]==UNO_none)//¸Ã²ÛÄÚÃ»ÓĞ¿¨
+	{
+		//cout<<choice<<"¸Ã²ÛÄÚÃ»ÓĞ¿¨!\n";		
+		UNO_update_all_info_to_himself(this_room,p1);//¸üĞÂËùÓĞĞÅÏ¢
+		return false;
+	}
+	//ÅĞ¶¨¸ÃÅÆÄÜ²»ÄÜÊ¹ÓÃ
+	if(!UNO_judge_whether_can_play(this_room,p1,choice))//Èç¹û²»ÄÜ´ò³öÕâÕÅÅÆ£¬½øĞĞÌáÊ¾
+	{
+		if(p1->state!=UNO_human){UNO_cout_this_card(p1->card_color[choice],p1->card_effect[choice]);return false;}
+		UNO_update_all_info_to_himself(this_room,p1);//¸üĞÂËùÓĞĞÅÏ¢
+		if(this_room->whose_turn==p1->room_member_NO)//Èç¹ûµ±Ç°ÊÇ×Ô¼º»ØºÏ
+		{
+			if(this_room->current_running_effect==UNO_add_card)//Èç¹ûµ±Ç°ÓĞ¼Ó·£Ğ§¹û
+				UNO_tips(p1,UNO_got_punish);
+			else
+				UNO_tips(p1,UNO_cannot_play_this_card);//½øĞĞÌáÊ¾£¬ÎŞ·¨´ò³öÕâÕÅÅÆ
+		}
+		//cout<<"×îºóÒ»ÕÅÅÆÊÇ";cout_this_card(this_room->last_color,this_room->last_effect);
+		//cout<<"¿É³öµÄÑÕÉ«ºÍĞ§¹ûÊÇ:";cout_this_card(this_room->current_color,this_room->last_effect);
+		//cout<<"ÄãÏë³öµÄÊÇ:";cout_this_card(p1->card_color[choice],p1->card_effect[choice]);
+		//cout<<"³öÅÆÊ§°Ü\n";
+		return false;//ÎŞ·¨Ê¹ÓÃ
+	}
 
+	//Ö´ĞĞµ½ÕâÀï±ØÈ»ÄÜ´ò³öÕâÕÅ¿¨£¬µ«ÒªÅĞ¶ÏÊÇ·ñÊÇ×Ô¼º»ØºÏ£¬ÊÇµÄÔò¿ÉÒÔ£¬²»ÊÇÔò²»¿ÉÒÔ
+	if(p1->card_color[choice]==this_room->last_color&&p1->card_effect[choice]==this_room->last_effect)//ÇÀ£¬ÎŞÊÓµ±Ç°ÊÇ·ñÊÇÎÒµÄ»ØºÏ£¬ÈôÏë³öµÄÅÆÓëµ±Ç°ÅÆÒ»ÖÂ£¬Ö±½Ó³ö
+	{
+		UNO_seize_turn(this_room,p1);//Ç¿ÖÆ±äÎªÎÒµÄ»ØºÏ,²¢´ò³öÄÇÕÅ¿¨
+	}
+	else
+		if(this_room->whose_turn!=p1->room_member_NO)//Èôµ±Ç°²»ÊÇÎÒµÄ»ØºÏ
+		{
+			UNO_update_all_info_to_himself(this_room,p1);//¸üĞÂËùÓĞĞÅÏ¢
+			//cout<<"µ±Ç°²»ÊÇÎÒµÄ»ØºÏ£¬ÎŞÊÓÇëÇó,ÎŞ·¨³öÅÆ\n";
+			return false;
+		}
+	//Ö´ĞĞµ½ÕâÀï±ØÈ»ÄÜ´ò³öÄÇÕÅÅÆ
+	UNO_play_this_card(this_room,p1,choice);
+	return true;
+
+}
 void UNO_get_card(UNO_room* this_room,UNO_player* p1,int number,bool whether_refresh_data)//»ñµÃÊÖ¿¨£¬×ÔÖ÷³é¿¨»ò¼Ó·£
 {
 	if(number<=0){cout<<"³é¿¨ÊıÁ¿Îª0£¿\n";return;}

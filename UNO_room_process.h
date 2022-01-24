@@ -42,7 +42,7 @@ void UNO_ini_room()//所有房间初始化
 			//AI分析方面
 			uno_room[i].player[j].only_color=UNO_none;
 			uno_room[i].player[j].not_have_color=UNO_none;
-			uno_room[i].player[j].i_want_play_this_card=UNO_none;//默认为啥颜色都不想出
+			uno_room[i].player[j].i_want_play_this_color=UNO_none;//默认为啥颜色都不想出
 			
 			
 		}
@@ -67,7 +67,7 @@ char* UNO_get_client_message(UNO_player* p1,int time_length)//获取客户端发送的信
 	client_member* c1=p1->c1;
 	memset(c1->p_message,0,sizeof(c1->p_message));
 	Sleep(10);
-	cout<<"游戏服务等待用户输入\n";
+	//cout<<"游戏服务等待用户输入\n";
 	int wait_time=0;
 	
 	while(strlen(c1->message)==0)
@@ -112,7 +112,7 @@ char* UNO_get_client_message(UNO_player* p1,int time_length)//获取客户端发送的信
 	addtext(c1->p_message,c1->message);
 	c1->not_be_read=false;
 	Sleep(5);
-	cout<<"get msg:"<<c1->p_message<<endl;
+	//cout<<"get msg:"<<c1->p_message<<endl;
 	return c1->p_message;
 }
 
@@ -223,8 +223,8 @@ void UNO_add_FULL_robot_to_room(client_member* c1)//如果是房主，进行添加机器人
 	else
 	{cout<<"房主为空？"<<who_is_master<<endl;return;}
 	
-	uno_room[c1->room_No].room_member=UNO_room_limit;//直接设置为满员
-	for(int i=0;i<UNO_room_limit;i++)
+	uno_room[c1->room_No].room_member=UNO_member_limit;//直接设置为满员
+	for(int i=0;i<UNO_member_limit;i++)
 		if(uno_room[c1->room_No].player[i].state==UNO_empty)
 			uno_room[c1->room_No].player[i].state=UNO_hard_AI;//角色变更为一般机器人
 	UNO_refresh_room_member_to_all(UNO_add_full_robot_success,&uno_room[c1->room_No],c1);
@@ -271,9 +271,9 @@ void UNO_create_room(client_member* c1)//用户创建房间
 	uno_room[this_room_number].player[0].state=UNO_human;//该位子状态设置为人类玩家
 
 	c1->room_No=this_room_number;//确认玩家所在房间号
-	c1->state=UNO_in_room;//更新玩家状态为“在uno房间内”
 	c1->guest=false;
 	UNO_refresh_room_member_to_all(UNO_create_room_success,&uno_room[this_room_number],c1);
+	c1->state=UNO_in_room;//更新玩家状态为“在uno房间内”
 	uno_room[this_room_number].room_member++;//房间内人数为1
 	
 }
@@ -281,8 +281,6 @@ void UNO_create_room(client_member* c1)//用户创建房间
 
 void UNO_show_room_in_use(client_member* c1)//向他展示所有能加入的房间
 {
-	
-		
 	if(UNO_room_in_use==0)//如果没有使用着的房间
 	{send_msg_signal(c1,UNO_no_room_in_use);return;}
 
@@ -327,7 +325,6 @@ void UNO_enter_room(client_member* c1,JSON_package json_msg)//用户进入别人的房间
 		{send_msg_signal(c1,UNO_room_is_in_game);return;}
 		
 		//执行到这一步必然加入成功
-		c1->state=UNO_in_room;
 		uno_room[choice].room_member++;//房间内人数+1
 		c1->guest=true;//加入房间的人是房间客人
 		c1->room_No=choice;
@@ -345,10 +342,7 @@ void UNO_enter_room(client_member* c1,JSON_package json_msg)//用户进入别人的房间
 
 		c1->room_No=choice;//保存房间号信息
 		UNO_refresh_room_member_to_all(UNO_enter_room_success,&uno_room[choice],c1);//刷新成员
-		
-
-
-	
+		c1->state=UNO_in_room;
 
 }
 
@@ -423,7 +417,7 @@ void UNO_exit_room(client_member* c1)//用户退出房间
 					if(this_room->game_start)//如果说游戏正在进行中
 					{
 						this_room->game_over=true;
-						Sleep(500);//等待AI线程结束
+						Sleep(600);//等待AI线程结束
 						this_room->game_start=false;
 					}
 					for(int k=0;k<UNO_member_limit;k++)
@@ -443,12 +437,12 @@ void UNO_exit_room(client_member* c1)//用户退出房间
 			{
 				//一般没人了说明是房主离开房间，房间内没人结算在房主变更手续中执行
 			}
-			c1->state=in_online;//更改用户状态为“在线”
 			c1->guest=false;
 			this_room->player[i].state=UNO_empty;//当前位子状态设置为空
 
 			send_msg_signal(c1,UNO_leave_room_success);//离开成功!
-			
+			c1->state=in_online;//更改用户状态为“在线”
+
 			//该成员离房手续办理结束，通知房间中其他人该角色离去
 			if(uno_room[c1->room_No].room_member!=0)//如果房间中还有人
 			{
